@@ -17,7 +17,7 @@ An export block descriptor-based queue library for tag values logged in Ewon Fle
 
 ## [Developer Documentation](#table-of-contents)
 
-Developer documentation is available in Javadoc format at [https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/](https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/).
+Developer documentation is available in Javadoc format at [https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/index.html](https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/index.html).
 
 ## [Dependencies](#table-of-contents)
 1. [sc-flexy-string-lib](https://github.com/hms-networks/sc-flexy-string-lib)
