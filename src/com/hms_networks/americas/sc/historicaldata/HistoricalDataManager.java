@@ -168,6 +168,7 @@ public class HistoricalDataManager {
 
   /**
    * Parse the specified historical file line and return its corresponding data point.
+   *
    * @param line line to parse
    * @return data point
    * @throws IOException if unable to access tag information
