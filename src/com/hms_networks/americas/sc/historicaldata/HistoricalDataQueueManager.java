@@ -99,6 +99,7 @@ public class HistoricalDataQueueManager {
     // Get start time from file, or start new time tracker if startNewTimeTracker is true.
     final String timeMarkerFileName =
         HistoricalDataConstants.QUEUE_FILE_FOLDER
+            + "/"
             + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
             + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
     String startTimeTrackerMs;
@@ -124,6 +125,7 @@ public class HistoricalDataQueueManager {
     // Run EBD export call
     final String ebdFileName =
         HistoricalDataConstants.QUEUE_FILE_FOLDER
+            + "/"
             + HistoricalDataConstants.QUEUE_EBD_FILE_NAME
             + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
     final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
