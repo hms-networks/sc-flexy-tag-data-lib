@@ -1,6 +1,8 @@
 package com.hms_networks.americas.sc.historicaldata;
 
 import com.hms_networks.americas.sc.fileutils.FileAccessManager;
+
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +57,20 @@ public class HistoricalDataQueueManager {
    */
   private static String convertToEBDTimeFormat(long time) {
     return new SimpleDateFormat(HistoricalDataConstants.EBD_TIME_FORMAT).format(new Date(time));
+  }
+
+  /**
+   * Gets a boolean representing if the time tracker file exists.
+   *
+   * @return true if time tracker file exists
+   */
+  public boolean doesTimeTrackerExist() {
+    final String timeTrackerFileName =
+        HistoricalDataConstants.QUEUE_FILE_FOLDER
+            + "/"
+            + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
+            + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
+    return new File(timeTrackerFileName).isFile();
   }
 
   /**
