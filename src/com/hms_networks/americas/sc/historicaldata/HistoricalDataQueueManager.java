@@ -64,7 +64,7 @@ public class HistoricalDataQueueManager {
    *
    * @return true if time tracker file exists
    */
-  public boolean doesTimeTrackerExist() {
+  public static boolean doesTimeTrackerExist() {
     final String timeTrackerFileName =
         HistoricalDataConstants.QUEUE_FILE_FOLDER
             + "/"
