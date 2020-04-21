@@ -125,9 +125,7 @@ public class HistoricalDataQueueManager {
       startTimeTrackerMs = Long.toString(startTimeTrackerMsLong);
       FileAccessManager.writeStringToFile(timeMarkerFileName, startTimeTrackerMs);
     } else {
-      startTimeTrackerMs =
-          FileAccessManager.readFileToString(
-              HistoricalDataConstants.FILE_URL_PREFIX + timeMarkerFileName);
+      startTimeTrackerMs = FileAccessManager.readFileToString(timeMarkerFileName);
       startTimeTrackerMsLong = Long.parseLong(startTimeTrackerMs);
     }
 
