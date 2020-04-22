@@ -230,18 +230,18 @@ public class HistoricalDataManager {
           String tagName = tagInfo.getName();
           if (tagType == TagType.BOOLEAN) {
             boolean boolValue = convertStrToBool(tagValue);
-            returnVal = new DataPointBoolean(tagName, boolValue, tagTimeInt);
+            returnVal = new DataPointBoolean(tagName, tagId, boolValue, tagTimeInt);
           } else if (tagType == TagType.FLOAT) {
             float floatValue = Float.valueOf(tagValue).floatValue();
-            returnVal = new DataPointFloat(tagName, floatValue, tagTimeInt);
+            returnVal = new DataPointFloat(tagName, tagId, floatValue, tagTimeInt);
           } else if (tagType == TagType.INTEGER) {
             int intValue = Integer.valueOf(tagValue).intValue();
-            returnVal = new DataPointInteger(tagName, intValue, tagTimeInt);
+            returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt);
           } else if (tagType == TagType.DWORD) {
             long dwordValue = Long.valueOf(tagValue).longValue();
-            returnVal = new DataPointDword(tagName, dwordValue, tagTimeInt);
+            returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt);
           } else if (tagType == TagType.STRING) {
-            returnVal = new DataPointString(tagName, tagValue, tagTimeInt);
+            returnVal = new DataPointString(tagName, tagId, tagValue, tagTimeInt);
           }
       }
     }
