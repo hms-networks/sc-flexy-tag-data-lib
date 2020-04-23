@@ -20,6 +20,13 @@ public class HistoricalDataQueueManager {
   /** Time span for fetching FIFO queue data. Default is 1 minute. */
   private static long queueFifoTimeSpanMins = 1;
 
+  /** File path for time marker */
+  private static final String timeMarkerFileName =
+      HistoricalDataConstants.QUEUE_FILE_FOLDER
+          + "/"
+          + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
+          + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
+
   /**
    * Get the current configured FIFO queue time span in milliseconds.
    *
@@ -65,12 +72,7 @@ public class HistoricalDataQueueManager {
    * @return true if time tracker file exists
    */
   public static boolean doesTimeTrackerExist() {
-    final String timeTrackerFileName =
-        HistoricalDataConstants.QUEUE_FILE_FOLDER
-            + "/"
-            + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
-            + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
-    return new File(timeTrackerFileName).isFile();
+    return new File(timeMarkerFileName).isFile();
   }
 
   /**
@@ -113,11 +115,6 @@ public class HistoricalDataQueueManager {
       boolean includeTagGroupD)
       throws IOException {
     // Get start time from file, or start new time tracker if startNewTimeTracker is true.
-    final String timeMarkerFileName =
-        HistoricalDataConstants.QUEUE_FILE_FOLDER
-            + "/"
-            + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
-            + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
     String startTimeTrackerMs;
     long startTimeTrackerMsLong;
     if (startNewTimeTracker) {
