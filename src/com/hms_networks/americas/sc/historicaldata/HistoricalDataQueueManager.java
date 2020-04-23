@@ -76,6 +76,16 @@ public class HistoricalDataQueueManager {
   }
 
   /**
+   * Gets the current value in the time tracker file.
+   *
+   * @return time tracker file value
+   */
+  public static long getCurrentTimeTrackerValue() {
+    String startTimeTrackerMs = FileAccessManager.readFileToString(timeMarkerFileName);
+    return Long.parseLong(startTimeTrackerMs);
+  }
+
+  /**
    * Get the historical log data for all tag groups within the next FIFO queue time span.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
