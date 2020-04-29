@@ -20,6 +20,9 @@ public class HistoricalDataQueueManager {
   /** Time span for fetching FIFO queue data. Default is 1 minute. */
   private static long queueFifoTimeSpanMins = 1;
 
+  /** Local time offset in milliseconds. */
+  private static long timeOffsetMilliseconds = 0;
+
   /** File path for time marker */
   private static final String timeMarkerFileName =
       HistoricalDataConstants.QUEUE_FILE_FOLDER
@@ -64,6 +67,24 @@ public class HistoricalDataQueueManager {
    */
   private static String convertToEBDTimeFormat(long time) {
     return new SimpleDateFormat(HistoricalDataConstants.EBD_TIME_FORMAT).format(new Date(time));
+  }
+
+  /**
+   * Configures the local time offset of the historical data queue.
+   *
+   * @param timeOffsetMilliseconds local time offset in milliseconds
+   */
+  public static void setLocalTimeOffset(long timeOffsetMilliseconds) {
+    HistoricalDataQueueManager.timeOffsetMilliseconds = timeOffsetMilliseconds;
+  }
+
+  /**
+   * Gets the current time with the configured time offset.
+   *
+   * @return current time minus local time offset
+   */
+  private static long getCurrentTimeWithOffset() {
+    return System.currentTimeMillis() - timeOffsetMilliseconds;
   }
 
   /**
@@ -129,7 +150,7 @@ public class HistoricalDataQueueManager {
     String startTimeTrackerMs;
     long startTimeTrackerMsLong;
     if (startNewTimeTracker) {
-      startTimeTrackerMsLong = System.currentTimeMillis();
+      startTimeTrackerMsLong = getCurrentTimeWithOffset();
       startTimeTrackerMs = Long.toString(startTimeTrackerMsLong);
       FileAccessManager.writeStringToFile(timeMarkerFileName, startTimeTrackerMs);
     } else {
