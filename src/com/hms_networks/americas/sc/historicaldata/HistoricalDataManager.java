@@ -32,10 +32,12 @@ public class HistoricalDataManager {
    * @param startTime start time of export
    * @param endTime end time of export
    * @param destinationFileName path of destination file
+   * @param stringHistorical export string historical logs if true
    * @throws IOException if export block descriptor fails
    */
   public static void exportAllHistoricalToFile(
-      String startTime, String endTime, String destinationFileName) throws IOException {
+      String startTime, String endTime, String destinationFileName, boolean stringHistorical)
+      throws IOException {
     final boolean includeTagGroupA = true;
     final boolean includeTagGroupB = true;
     final boolean includeTagGroupC = true;
@@ -47,7 +49,8 @@ public class HistoricalDataManager {
         includeTagGroupA,
         includeTagGroupB,
         includeTagGroupC,
-        includeTagGroupD);
+        includeTagGroupD,
+        stringHistorical);
   }
 
   /**
@@ -61,6 +64,7 @@ public class HistoricalDataManager {
    * @param includeTagGroupB include tag group B
    * @param includeTagGroupC include tag group C
    * @param includeTagGroupD include tag group D
+   * @param stringHistorical export string historical logs if true
    * @throws IOException if export block descriptor fails
    */
   public static void exportHistoricalToFile(
@@ -70,7 +74,8 @@ public class HistoricalDataManager {
       boolean includeTagGroupA,
       boolean includeTagGroupB,
       boolean includeTagGroupC,
-      boolean includeTagGroupD)
+      boolean includeTagGroupD,
+      boolean stringHistorical)
       throws IOException {
     // Check for valid group selection
     if (!includeTagGroupA && !includeTagGroupB && !includeTagGroupC && !includeTagGroupD) {
@@ -93,15 +98,24 @@ public class HistoricalDataManager {
       tagGroupFilterStr += "D";
     }
 
+    // Get EBD data type
+    String ebdDataType;
+    if (stringHistorical) {
+      ebdDataType = "HS";
+    } else {
+      ebdDataType = "HL";
+    }
+
     /*
      * Build EBD string with parameters
-     * dtHL: data type, historical logs
+     * dt[ebdDataType]: data type, value specified in string ebdDataType
      * ftT: file type, text
      * startTime: start time for data
      * endTime: end time for data
      * flABCD: filter type, specified tag groups
      */
-    final String ebdStr = "$dtHL$ftT$st" + startTime + "$et" + endTime + "$fl" + tagGroupFilterStr;
+    final String ebdStr =
+        "$dt" + ebdDataType + "$ftT$st" + startTime + "$et" + endTime + "$fl" + tagGroupFilterStr;
 
     // Perform EBD call
     Exporter exporter = new Exporter(ebdStr);
