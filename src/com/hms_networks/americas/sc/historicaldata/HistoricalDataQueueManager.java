@@ -163,7 +163,7 @@ public class HistoricalDataQueueManager {
      * end time is in the future.
      */
     long startTimeTrackerMsPlusSpan = startTimeTrackerMsLong + getQueueFifoTimeSpanMillis();
-    long endTimeTrackerMsLong = Math.min(startTimeTrackerMsPlusSpan, System.currentTimeMillis());
+    long endTimeTrackerMsLong = Math.min(startTimeTrackerMsPlusSpan, getCurrentTimeWithOffset());
 
     // Run EBD export call
     final String ebdFileName =
