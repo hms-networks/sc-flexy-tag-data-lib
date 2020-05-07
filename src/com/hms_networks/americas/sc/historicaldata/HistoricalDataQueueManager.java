@@ -23,6 +23,9 @@ public class HistoricalDataQueueManager {
   /** Local time offset in milliseconds. */
   private static long timeOffsetMilliseconds = 0;
 
+  /** Boolean flag indicating if string history data should be included in queue data. */
+  private static boolean stringHistoryEnabled = false;
+
   /** File path for time marker */
   private static final String timeMarkerFileName =
       HistoricalDataConstants.QUEUE_FILE_FOLDER
@@ -85,6 +88,15 @@ public class HistoricalDataQueueManager {
    */
   public static long getCurrentTimeWithOffset() {
     return System.currentTimeMillis() - timeOffsetMilliseconds;
+  }
+
+  /**
+   * Sets the flag indicating if string history data should be included in queue data.
+   *
+   * @param stringHistoryEnabled true if string history should be include, false if not
+   */
+  public static void setStringHistoryEnabled(boolean stringHistoryEnabled) {
+    HistoricalDataQueueManager.stringHistoryEnabled = stringHistoryEnabled;
   }
 
   /**
@@ -165,14 +177,17 @@ public class HistoricalDataQueueManager {
     long startTimeTrackerMsPlusSpan = startTimeTrackerMsLong + getQueueFifoTimeSpanMillis();
     long endTimeTrackerMsLong = Math.min(startTimeTrackerMsPlusSpan, getCurrentTimeWithOffset());
 
-    // Run EBD export call
+    // Calculate EBD start and end time
+    final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
+    final String ebdEndTime = convertToEBDTimeFormat(endTimeTrackerMsLong);
+
+    // Run standard EBD export call (int, float, ...)
     final String ebdFileName =
         HistoricalDataConstants.QUEUE_FILE_FOLDER
             + "/"
             + HistoricalDataConstants.QUEUE_EBD_FILE_NAME
             + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
-    final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
-    final String ebdEndTime = convertToEBDTimeFormat(endTimeTrackerMsLong);
+    boolean stringHistorical = false;
     HistoricalDataManager.exportHistoricalToFile(
         ebdStartTime,
         ebdEndTime,
@@ -180,10 +195,34 @@ public class HistoricalDataQueueManager {
         includeTagGroupA,
         includeTagGroupB,
         includeTagGroupC,
-        includeTagGroupD);
+        includeTagGroupD,
+        stringHistorical);
 
-    // Parse EBD export call
+    // Parse standard EBD export call
     ArrayList queueData = HistoricalDataManager.parseHistoricalFile(ebdFileName);
+
+    // Run string EBD export call if enabled
+    if (stringHistoryEnabled) {
+      final String ebdStringFileName =
+          HistoricalDataConstants.QUEUE_FILE_FOLDER
+              + "/"
+              + HistoricalDataConstants.QUEUE_EBD_STRING_FILE_NAME
+              + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
+      stringHistorical = true;
+      HistoricalDataManager.exportHistoricalToFile(
+          ebdStartTime,
+          ebdEndTime,
+          ebdFileName,
+          includeTagGroupA,
+          includeTagGroupB,
+          includeTagGroupC,
+          includeTagGroupD,
+          stringHistorical);
+
+      // Parse string EBD export call and combine with standard EBD call results
+      ArrayList queueStringData = HistoricalDataManager.parseHistoricalFile(ebdStringFileName);
+      queueData.addAll(queueStringData);
+    }
 
     // Store end time +1 ms (to prevent duplicate data)
     final String newTimeTrackerVal = Long.toString(endTimeTrackerMsLong + 1);

@@ -47,6 +47,9 @@ class HistoricalDataConstants {
   /** Name of EBD export call file */
   static final String QUEUE_EBD_FILE_NAME = "histDataEBD";
 
+  /** Name of EBD string export call file */
+  static final String QUEUE_EBD_STRING_FILE_NAME = "histStringDataEBD";
+
   /** Name of historical data queue time tracker file */
   static final String QUEUE_TIME_FILE_NAME = "histDataTime";
 }
