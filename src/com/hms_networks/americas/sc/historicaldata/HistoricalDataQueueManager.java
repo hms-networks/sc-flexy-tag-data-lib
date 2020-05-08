@@ -212,7 +212,7 @@ public class HistoricalDataQueueManager {
       HistoricalDataManager.exportHistoricalToFile(
           ebdStartTime,
           ebdEndTime,
-          ebdFileName,
+          ebdStringFileName,
           includeTagGroupA,
           includeTagGroupB,
           includeTagGroupC,
