@@ -236,8 +236,7 @@ public class HistoricalDataManager {
 
           // Get corresponding tag info object for tag
           int tagInfoListIDOffset = TagInfoManager.getLowestTagIdSeen();
-          TagInfo tagInfo =
-              (TagInfo) TagInfoManager.getTagInfoList().get(tagId - tagInfoListIDOffset);
+          TagInfo tagInfo = (TagInfo) TagInfoManager.getTagInfoArray()[tagId - tagInfoListIDOffset];
 
           // Create data point for tag type
           TagType tagType = tagInfo.getType();
