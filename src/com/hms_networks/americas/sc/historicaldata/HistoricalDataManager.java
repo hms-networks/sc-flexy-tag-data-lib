@@ -147,7 +147,10 @@ public class HistoricalDataManager {
       if (lineCount > 0) {
         // Parse line
         DataPoint lineDataPoint = parseHistoricalFileLine(line);
-        dataPoints.add(lineDataPoint);
+
+        if (lineDataPoint != null) {
+          dataPoints.add(lineDataPoint);
+        }
 
         /*
          * Reading historical log EBD file can take a large amount of time.
@@ -236,25 +239,33 @@ public class HistoricalDataManager {
 
           // Get corresponding tag info object for tag
           int tagInfoListIDOffset = TagInfoManager.getLowestTagIdSeen();
-          TagInfo tagInfo = (TagInfo) TagInfoManager.getTagInfoArray()[tagId - tagInfoListIDOffset];
+          TagInfo tagInfo;
+          try {
+            tagInfo = (TagInfo) TagInfoManager.getTagInfoArray()[tagId - tagInfoListIDOffset];
+          } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            break;
+          }
 
-          // Create data point for tag type
-          TagType tagType = tagInfo.getType();
-          String tagName = tagInfo.getName();
-          if (tagType == TagType.BOOLEAN) {
-            boolean boolValue = convertStrToBool(tagValue);
-            returnVal = new DataPointBoolean(tagName, tagId, boolValue, tagTimeInt);
-          } else if (tagType == TagType.FLOAT) {
-            float floatValue = Float.valueOf(tagValue).floatValue();
-            returnVal = new DataPointFloat(tagName, tagId, floatValue, tagTimeInt);
-          } else if (tagType == TagType.INTEGER) {
-            int intValue = Integer.valueOf(tagValue).intValue();
-            returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt);
-          } else if (tagType == TagType.DWORD) {
-            long dwordValue = Long.valueOf(tagValue).longValue();
-            returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt);
-          } else if (tagType == TagType.STRING) {
-            returnVal = new DataPointString(tagName, tagId, tagValue, tagTimeInt);
+          if (tagInfo != null) {
+            // Create data point for tag type
+            TagType tagType = tagInfo.getType();
+            String tagName = tagInfo.getName();
+            if (tagType == TagType.BOOLEAN) {
+              boolean boolValue = convertStrToBool(tagValue);
+              returnVal = new DataPointBoolean(tagName, tagId, boolValue, tagTimeInt);
+            } else if (tagType == TagType.FLOAT) {
+              float floatValue = Float.valueOf(tagValue).floatValue();
+              returnVal = new DataPointFloat(tagName, tagId, floatValue, tagTimeInt);
+            } else if (tagType == TagType.INTEGER) {
+              int intValue = Integer.valueOf(tagValue).intValue();
+              returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt);
+            } else if (tagType == TagType.DWORD) {
+              long dwordValue = Long.valueOf(tagValue).longValue();
+              returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt);
+            } else if (tagType == TagType.STRING) {
+              returnVal = new DataPointString(tagName, tagId, tagValue, tagTimeInt);
+            }
           }
       }
     }
