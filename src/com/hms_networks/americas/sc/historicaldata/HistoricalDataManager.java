@@ -2,12 +2,7 @@ package com.hms_networks.americas.sc.historicaldata;
 
 import com.ewon.ewonitf.Exporter;
 
-import com.hms_networks.americas.sc.datapoint.DataPoint;
-import com.hms_networks.americas.sc.datapoint.DataPointBoolean;
-import com.hms_networks.americas.sc.datapoint.DataPointDword;
-import com.hms_networks.americas.sc.datapoint.DataPointFloat;
-import com.hms_networks.americas.sc.datapoint.DataPointInteger;
-import com.hms_networks.americas.sc.datapoint.DataPointString;
+import com.hms_networks.americas.sc.datapoint.*;
 import com.hms_networks.americas.sc.string.QuoteSafeStringTokenizer;
 import com.hms_networks.americas.sc.taginfo.TagInfo;
 import com.hms_networks.americas.sc.taginfo.TagInfoManager;
@@ -201,6 +196,7 @@ public class HistoricalDataManager {
     int tagId = -1;
     String tagTimeInt = "";
     String tagValue = "";
+    int tagQuality = DataQuality.GOOD.getRawDataQuality();
 
     // Create DataPoint for returning
     DataPoint returnVal = null;
@@ -232,6 +228,10 @@ public class HistoricalDataManager {
           tagValue = currentToken;
           break;
         case (HistoricalDataConstants.EBD_LINE_LENGTH - 1):
+          // Get tag quality
+          tagQuality = Integer.parseInt(currentToken);
+          DataQuality dataQuality = DataQuality.fromRawDataQuality(tagQuality);
+
           // Check if tag information list available, populate list if not
           boolean tagInfoListAvailable = TagInfoManager.isTagInfoListPopulated();
           if (!tagInfoListAvailable) {
@@ -254,18 +254,18 @@ public class HistoricalDataManager {
             String tagName = tagInfo.getName();
             if (tagType == TagType.BOOLEAN) {
               boolean boolValue = convertStrToBool(tagValue);
-              returnVal = new DataPointBoolean(tagName, tagId, boolValue, tagTimeInt);
+              returnVal = new DataPointBoolean(tagName, tagId, boolValue, tagTimeInt, dataQuality);
             } else if (tagType == TagType.FLOAT) {
               float floatValue = Float.valueOf(tagValue).floatValue();
-              returnVal = new DataPointFloat(tagName, tagId, floatValue, tagTimeInt);
+              returnVal = new DataPointFloat(tagName, tagId, floatValue, tagTimeInt, dataQuality);
             } else if (tagType == TagType.INTEGER) {
               int intValue = Integer.valueOf(tagValue).intValue();
-              returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt);
+              returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt, dataQuality);
             } else if (tagType == TagType.DWORD) {
               long dwordValue = Long.valueOf(tagValue).longValue();
-              returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt);
+              returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt, dataQuality);
             } else if (tagType == TagType.STRING) {
-              returnVal = new DataPointString(tagName, tagId, tagValue, tagTimeInt);
+              returnVal = new DataPointString(tagName, tagId, tagValue, tagTimeInt, dataQuality);
             }
           }
       }
