@@ -230,6 +230,7 @@ public class HistoricalDataManager {
           break;
         case HistoricalDataConstants.EBD_LINE_TAG_VALUE_INDEX:
           tagValue = currentToken;
+          break;
         case (HistoricalDataConstants.EBD_LINE_LENGTH - 1):
           // Check if tag information list available, populate list if not
           boolean tagInfoListAvailable = TagInfoManager.isTagInfoListPopulated();
