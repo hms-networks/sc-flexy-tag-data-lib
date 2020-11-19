@@ -24,3 +24,4 @@ Developer documentation is available in Javadoc format at [https://hms-networks.
 2. [sc-flexy-datapoint-lib](https://github.com/hms-networks/sc-flexy-datapoint-lib)
 3. [sc-flexy-tag-info-lib](https://github.com/hms-networks/sc-flexy-tag-info-lib)
 4. [sc-flexy-file-util-lib](https://github.com/hms-networks/sc-flexy-file-util-lib)
+5. [sc-flexy-logger-lib](https://github.com/hms-networks/sc-flexy-logger-lib)
