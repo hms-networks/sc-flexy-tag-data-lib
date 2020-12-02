@@ -145,12 +145,12 @@ public class RealTimeDataQueueManager {
    * @param tagGroup The tag group to fetch data from.
    */
   public static void dataFetcher(int tagGroup) {
-    ArrayList tagGroupList = (ArrayList) tagManagers.get(tagGroup);
-    if (tagGroupList != null) {
+    ArrayList tagGroupArray = (ArrayList) tagManagers.get(tagGroup);
+    if (tagGroupArray != null) {
       // for each tag in the tag group, record a new value
-      for (int i = 0; i < tagGroupList.size(); i++) {
+      for (int i = 0; i < tagGroupArray.size(); i++) {
         TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(i));
-        ((RealTimeTagDataPointManager) tagGroupList.get(i)).recordCurentTagValue(currentTag);
+        ((RealTimeTagDataPointManager) tagGroupArray.get(i)).recordCurentTagValue(currentTag);
       }
     }
   }
