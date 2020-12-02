@@ -67,7 +67,11 @@ public class RealTimeDataQueueManager {
             ((TagInfo) ((ArrayList) tagGroupList.get(tagListIndex)).get(tagGroupIndex));
         tagManagerTmp.add(new RealTimeTagDataPointManager(currentTag.getName()));
       }
-      tagManagers.add(tagManagerTmp);
+      if (tagManagerTmp.isEmpty()) {
+        tagManagers.add(null);
+      } else {
+        tagManagers.add(tagManagerTmp);
+      }
     }
   }
 
@@ -126,9 +130,12 @@ public class RealTimeDataQueueManager {
    */
   public static int getNumGroupDataPoints(int tagGroup) {
     int numDataPoints = 0;
-    for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
-      numDataPoints +=
-          ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i)).getSize();
+    if (((ArrayList) tagManagers.get(tagGroup)) != null) {
+      for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
+        numDataPoints +=
+            ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i))
+                .getSize();
+      }
     }
     return numDataPoints;
   }
@@ -140,11 +147,13 @@ public class RealTimeDataQueueManager {
    * @param tagGroup The tag group to fetch data from.
    */
   public static void dataFetcher(int tagGroup) {
-    // for each tag in the tag group, record a new value
-    for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
-      TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(i));
-      ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i))
-          .recordCurentTagValue(currentTag);
+    if (((ArrayList) tagManagers.get(tagGroup)) != null) {
+      // for each tag in the tag group, record a new value
+      for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
+        TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(i));
+        ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i))
+            .recordCurentTagValue(currentTag);
+      }
     }
   }
 }
