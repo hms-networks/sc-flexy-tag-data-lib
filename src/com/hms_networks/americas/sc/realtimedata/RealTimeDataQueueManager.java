@@ -129,11 +129,10 @@ public class RealTimeDataQueueManager {
    */
   public static int getNumGroupDataPoints(int tagGroup) {
     int numDataPoints = 0;
-    if (((ArrayList) tagManagers.get(tagGroup)) != null) {
-      for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
-        numDataPoints +=
-            ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i))
-                .getSize();
+    ArrayList tagGroupList = (ArrayList) tagManagers.get(tagGroup);
+    if (tagGroupList != null) {
+      for (int i = 0; i < tagGroupList.size(); i++) {
+        numDataPoints += ((RealTimeTagDataPointManager) tagGroupList.get(i)).getSize();
       }
     }
     return numDataPoints;
@@ -146,12 +145,12 @@ public class RealTimeDataQueueManager {
    * @param tagGroup The tag group to fetch data from.
    */
   public static void dataFetcher(int tagGroup) {
-    if (((ArrayList) tagManagers.get(tagGroup)) != null) {
+    ArrayList tagGroupList = (ArrayList) tagManagers.get(tagGroup);
+    if (tagGroupList != null) {
       // for each tag in the tag group, record a new value
-      for (int i = 0; i < ((ArrayList) tagManagers.get(tagGroup)).size(); i++) {
+      for (int i = 0; i < tagGroupList.size(); i++) {
         TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(i));
-        ((RealTimeTagDataPointManager) ((ArrayList) tagManagers.get(tagGroup)).get(i))
-            .recordCurentTagValue(currentTag);
+        ((RealTimeTagDataPointManager) tagGroupList.get(i)).recordCurentTagValue(currentTag);
       }
     }
   }
