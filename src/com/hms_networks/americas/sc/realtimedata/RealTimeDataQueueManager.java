@@ -63,7 +63,7 @@ public class RealTimeDataQueueManager {
       final int tagGroupListSize = ((ArrayList) tagGroupList.get(tagGroupIndex)).size();
       for (int tagListIndex = 0; tagListIndex < tagGroupListSize; tagListIndex++) {
         TagInfo currentTag =
-            ((TagInfo) ((ArrayList) tagGroupList.get(tagListIndex)).get(tagGroupIndex));
+            ((TagInfo) ((ArrayList) tagGroupList.get(tagGroupIndex)).get(tagListIndex));
         tagManagerTmp.add(new RealTimeTagDataPointManager(currentTag.getName()));
       }
       if (tagManagerTmp.isEmpty()) {
