@@ -105,7 +105,7 @@ public class RealTimeDataQueueManager {
    * <p>If there are no DataPoints left, null will be returned.
    *
    * @param tagGroup The tag group to select a datapoint from.
-   * @return returns a DataPoint object.
+   * @return a DataPoint object.
    */
   public static DataPoint getGroupNextData(int tagGroup) {
     DataPoint data = null;
