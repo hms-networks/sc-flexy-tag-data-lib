@@ -1,4 +1,4 @@
-# sc-flexy-historical-data-queue-lib
+# sc-flexy-tag-data-queue-lib
 
 THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT WARRANT THAT THE FUNCTIONS OF THE CODE WILL MEET YOUR REQUIREMENTS, OR THAT THE OPERATION OF THE CODE WILL BE UNINTERRUPTED OR ERROR-FREE, OR THAT DEFECTS IN IT CAN BE CORRECTED.
 ---
@@ -13,11 +13,11 @@ THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT WARRANT 
 
 ## [Description](#table-of-contents)
 
-An export block descriptor-based queue library for tag values logged in Ewon Flexy historical logs.
+A library to get historical or real time tag values.
 
 ## [Developer Documentation](#table-of-contents)
 
-Developer documentation is available in Javadoc format at [https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/index.html](https://hms-networks.github.io/sc-flexy-historical-data-queue-lib/index.html).
+Developer documentation is available in Javadoc format at [https://hms-networks.github.io/sc-flexy-tag-data-queue-lib/index.html](https://hms-networks.github.io/sc-flexy-tag-data-queue-lib/index.html).
 
 ## [Dependencies](#table-of-contents)
 1. [sc-flexy-string-lib](https://github.com/hms-networks/sc-flexy-string-lib)
