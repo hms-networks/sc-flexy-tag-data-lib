@@ -97,7 +97,6 @@ public class RealTimeTagDataPointManager {
    * Gets a tag's current value into a list of tag current values.
    *
    * @param tag the tag to inspect
-   * @return returns a DataPoint object holding the tags current value
    */
   public void recordCurentTagValue(TagInfo tag) {
 
