@@ -1,4 +1,11 @@
-# Ewon Flexy Historical Data Queue Library Changelog
+# Ewon Flexy Tag Data Library Changelog
+
+## v2.0
+### Major Changes
+- Feature: Add support for real time data
+
+### Minor Changes
+- None
 
 ## v1.2
 ### Major Changes
