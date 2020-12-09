@@ -3,6 +3,7 @@ package com.hms_networks.americas.sc.realtimedata;
 import java.util.ArrayList;
 
 import com.hms_networks.americas.sc.datapoint.DataPoint;
+import com.hms_networks.americas.sc.logging.Logger;
 import com.hms_networks.americas.sc.taginfo.TagGroup;
 import com.hms_networks.americas.sc.taginfo.TagInfo;
 import com.hms_networks.americas.sc.taginfo.TagInfoManager;
@@ -148,9 +149,19 @@ public class RealTimeDataQueueManager {
     ArrayList tagGroupArray = (ArrayList) tagManagers.get(tagGroup);
     if (tagGroupArray != null) {
       // for each tag in the tag group, record a new value
-      for (int i = 0; i < tagGroupArray.size(); i++) {
-        TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(i));
-        ((RealTimeTagDataPointManager) tagGroupArray.get(i)).recordCurentTagValue(currentTag);
+      for (int tagNum = 0; tagNum < tagGroupArray.size(); tagNum++) {
+        TagInfo currentTag = ((TagInfo) ((ArrayList) tagGroupList.get(tagGroup)).get(tagNum));
+        ((RealTimeTagDataPointManager) tagGroupArray.get(tagNum)).recordCurentTagValue(currentTag);
+        final int numTagsBeforeSleep = 1;
+        final int sleepMilliseconds = 1;
+        if ((tagNum % numTagsBeforeSleep) == 0) {
+          try {
+            Thread.sleep(sleepMilliseconds);
+          } catch (InterruptedException e) {
+            Logger.LOG_WARN("Unable to sleep thread between real time data reads.");
+            Logger.LOG_EXCEPTION(e);
+          }
+        }
       }
     }
   }
