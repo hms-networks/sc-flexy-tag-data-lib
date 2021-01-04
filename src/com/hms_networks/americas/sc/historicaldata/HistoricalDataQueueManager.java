@@ -177,58 +177,80 @@ public class HistoricalDataQueueManager {
     long startTimeTrackerMsPlusSpan = startTimeTrackerMsLong + getQueueFifoTimeSpanMillis();
     long endTimeTrackerMsLong = Math.min(startTimeTrackerMsPlusSpan, getCurrentTimeWithOffset());
 
-    // Calculate EBD start and end time
-    final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
-    final String ebdEndTime = convertToEBDTimeFormat(endTimeTrackerMsLong);
+    ArrayList queueData = new ArrayList();
 
-    // Run standard EBD export call (int, float, ...)
-    final String ebdFileName =
-        HistoricalDataConstants.QUEUE_FILE_FOLDER
-            + "/"
-            + HistoricalDataConstants.QUEUE_EBD_FILE_NAME
-            + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
-    boolean stringHistorical = false;
-    HistoricalDataManager.exportHistoricalToFile(
-        ebdStartTime,
-        ebdEndTime,
-        ebdFileName,
-        includeTagGroupA,
-        includeTagGroupB,
-        includeTagGroupC,
-        includeTagGroupD,
-        stringHistorical);
+    // Ensure start time is not equal to end time
+    if (!sameSecond(startTimeTrackerMsLong, endTimeTrackerMsLong)) {
+      // Calculate EBD start and end time
+      final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
+      final String ebdEndTime = convertToEBDTimeFormat(endTimeTrackerMsLong);
 
-    // Parse standard EBD export call
-    ArrayList queueData = HistoricalDataManager.parseHistoricalFile(ebdFileName);
-
-    // Run string EBD export call if enabled
-    if (stringHistoryEnabled) {
-      final String ebdStringFileName =
+      // Run standard EBD export call (int, float, ...)
+      final String ebdFileName =
           HistoricalDataConstants.QUEUE_FILE_FOLDER
               + "/"
-              + HistoricalDataConstants.QUEUE_EBD_STRING_FILE_NAME
+              + HistoricalDataConstants.QUEUE_EBD_FILE_NAME
               + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
-      stringHistorical = true;
+      boolean stringHistorical = false;
       HistoricalDataManager.exportHistoricalToFile(
           ebdStartTime,
           ebdEndTime,
-          ebdStringFileName,
+          ebdFileName,
           includeTagGroupA,
           includeTagGroupB,
           includeTagGroupC,
           includeTagGroupD,
           stringHistorical);
 
-      // Parse string EBD export call and combine with standard EBD call results
-      ArrayList queueStringData = HistoricalDataManager.parseHistoricalFile(ebdStringFileName);
-      queueData.addAll(queueStringData);
-    }
+      // Parse standard EBD export call
+      queueData = HistoricalDataManager.parseHistoricalFile(ebdFileName);
 
-    // Store end time +1 ms (to prevent duplicate data)
-    final String newTimeTrackerVal = Long.toString(endTimeTrackerMsLong + 1);
-    FileAccessManager.writeStringToFile(timeMarkerFileName, newTimeTrackerVal);
+      // Run string EBD export call if enabled
+      if (stringHistoryEnabled) {
+        final String ebdStringFileName =
+            HistoricalDataConstants.QUEUE_FILE_FOLDER
+                + "/"
+                + HistoricalDataConstants.QUEUE_EBD_STRING_FILE_NAME
+                + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
+        stringHistorical = true;
+        HistoricalDataManager.exportHistoricalToFile(
+            ebdStartTime,
+            ebdEndTime,
+            ebdStringFileName,
+            includeTagGroupA,
+            includeTagGroupB,
+            includeTagGroupC,
+            includeTagGroupD,
+            stringHistorical);
+
+        // Parse string EBD export call and combine with standard EBD call results
+        ArrayList queueStringData = HistoricalDataManager.parseHistoricalFile(ebdStringFileName);
+        queueData.addAll(queueStringData);
+      }
+
+      // Store end time +1 ms (to prevent duplicate data)
+      final String newTimeTrackerVal = Long.toString(endTimeTrackerMsLong + 1);
+      FileAccessManager.writeStringToFile(timeMarkerFileName, newTimeTrackerVal);
+    }
 
     // Return data
     return queueData;
+  }
+
+  /**
+   * Compare a start and end time in milliseconds to see if they are in the same second.
+   *
+   * @param startTimeMillis the start time in milliseconds.
+   * @param endTimeMillis the end time in milliseconds.
+   * @return true if the times are in the same second
+   */
+  private static boolean sameSecond(long startTimeMillis, long endTimeMillis) {
+    boolean isSameSecond = false;
+    long oneSecondMillis = 1000;
+    if ((startTimeMillis / oneSecondMillis) == (endTimeMillis / oneSecondMillis)) {
+      isSameSecond = true;
+    }
+
+    return isSameSecond;
   }
 }
