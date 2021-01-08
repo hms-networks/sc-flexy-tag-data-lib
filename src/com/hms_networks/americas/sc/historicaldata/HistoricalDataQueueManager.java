@@ -179,8 +179,8 @@ public class HistoricalDataQueueManager {
 
     ArrayList queueData = new ArrayList();
 
-    // Ensure start time is not equal to end time
-    if (!sameSecond(startTimeTrackerMsLong, endTimeTrackerMsLong)) {
+    // Ensure start time is not equal to end time, and enough time has passed to grab new data
+    if (enoughSeconds(startTimeTrackerMsLong, endTimeTrackerMsLong)) {
       // Calculate EBD start and end time
       final String ebdStartTime = convertToEBDTimeFormat(startTimeTrackerMsLong);
       final String ebdEndTime = convertToEBDTimeFormat(endTimeTrackerMsLong);
@@ -238,19 +238,26 @@ public class HistoricalDataQueueManager {
   }
 
   /**
-   * Compare a start and end time in milliseconds to see if they are in the same second.
+   * Compare a start and end time in milliseconds to see if enough time has passed for an EBD call.
    *
    * @param startTimeMillis the start time in milliseconds.
    * @param endTimeMillis the end time in milliseconds.
-   * @return true if the times are in the same second
+   * @return true if enough time has passed for the next EBD call
    */
-  private static boolean sameSecond(long startTimeMillis, long endTimeMillis) {
-    boolean isSameSecond = false;
+  private static boolean enoughSeconds(long startTimeMillis, long endTimeMillis) {
+    boolean enoughTimePassed = true;
     long oneSecondMillis = 1000;
-    if ((startTimeMillis / oneSecondMillis) == (endTimeMillis / oneSecondMillis)) {
-      isSameSecond = true;
+    long secondsPassed = (endTimeMillis / oneSecondMillis) - (startTimeMillis / oneSecondMillis);
+
+    /* If the export block descriptor start and end time are the same, no data is grabbed.
+     * If there is 1 second between the start and end time EBD calls do not work consistently.
+     * EBD calls work consistently when 2 or more seconds have passed between the start and end time.
+     */
+    int twoSeconds = 2;
+    if (secondsPassed < twoSeconds) {
+      enoughTimePassed = false;
     }
 
-    return isSameSecond;
+    return enoughTimePassed;
   }
 }
