@@ -17,7 +17,7 @@ A library to get historical or real time tag values.
 
 ## [Developer Documentation](#table-of-contents)
 
-Developer documentation is available in Javadoc format at [https://hms-networks.github.io/sc-flexy-tag-data-queue-lib/index.html](https://hms-networks.github.io/sc-flexy-tag-data-queue-lib/index.html).
+Developer documentation is available in Javadoc format found in the release package [https://github.com/hms-networks/sc-flexy-tag-data-lib/releases](https://github.com/hms-networks/sc-flexy-tag-data-lib/releases).
 
 ## [Dependencies](#table-of-contents)
 1. [sc-flexy-string-lib](https://github.com/hms-networks/sc-flexy-string-lib)
