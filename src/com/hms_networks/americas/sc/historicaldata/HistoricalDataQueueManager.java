@@ -26,11 +26,27 @@ public class HistoricalDataQueueManager {
   /** Boolean flag indicating if string history data should be included in queue data. */
   private static boolean stringHistoryEnabled = false;
 
-  /** File path for time marker */
-  private static final String timeMarkerFileName =
+  /**
+   * Boolean flag indicating if reads are from QUEUE_TIME_FILE_1_NAME or QUEUE_TIME_FILE_2_NAME. If
+   * set to false, reads are from QUEUE_TIME_FILE_2_NAME.
+   */
+  private static boolean isFile1CurrTimeTrackerFile = true;
+
+  /** Boolean flag indicating if time has been initialized. */
+  private static boolean hasInitTime = false;
+
+  /** File path for time marker file 1. */
+  private static final String timeMarkerFile1Name =
       HistoricalDataConstants.QUEUE_FILE_FOLDER
           + "/"
-          + HistoricalDataConstants.QUEUE_TIME_FILE_NAME
+          + HistoricalDataConstants.QUEUE_TIME_FILE_1_NAME
+          + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
+
+  /** File path for time marker file 2. */
+  private static final String timeMarkerFile2Name =
+      HistoricalDataConstants.QUEUE_FILE_FOLDER
+          + "/"
+          + HistoricalDataConstants.QUEUE_TIME_FILE_2_NAME
           + HistoricalDataConstants.QUEUE_FILE_EXTENSION;
 
   /**
@@ -100,23 +116,39 @@ public class HistoricalDataQueueManager {
   }
 
   /**
-   * Gets a boolean representing if the time tracker file exists.
+   * Gets a boolean representing if both of the time tracker file exists.
    *
-   * @return true if time tracker file exists
+   * @return true if both time tracker file exists
    */
   public static boolean doesTimeTrackerExist() {
-    return new File(timeMarkerFileName).isFile();
+    return (new File(timeMarkerFile1Name).isFile() && new File(timeMarkerFile2Name).isFile());
   }
 
   /**
    * Gets the current value in the time tracker file.
    *
    * @throws IOException if unable to read file
+   * @throws CorruptedTimeTrackerException if one of the tracking files is corrupted
+   * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
    * @return time tracker file value
    */
-  public static long getCurrentTimeTrackerValue() throws IOException {
-    String startTimeTrackerMs = FileAccessManager.readFileToString(timeMarkerFileName);
-    return Long.parseLong(startTimeTrackerMs);
+  public static long getCurrentTimeTrackerValue()
+      throws IOException, CorruptedTimeTrackerException, TimeTrackerUnrecoverableException {
+    String readFile;
+    long startTimeTrackerMsLong = 0;
+    if (isFile1CurrTimeTrackerFile) {
+      readFile = timeMarkerFile1Name;
+    } else {
+      readFile = timeMarkerFile2Name;
+    }
+
+    try {
+      String startTimeTrackerMs = FileAccessManager.readFileToString(readFile);
+      startTimeTrackerMsLong = Long.parseLong(startTimeTrackerMs);
+    } catch (Exception e) {
+      initTimeTrackerFiles();
+    }
+    return startTimeTrackerMsLong;
   }
 
   /**
@@ -125,9 +157,11 @@ public class HistoricalDataQueueManager {
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
    * @return historical log data
    * @throws IOException if unable to read or write files
+   * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
+   * @throws CorruptedTimeTrackerException if the current time tracking file is corrupted
    */
   public static synchronized ArrayList getFifoNextSpanDataAllGroups(boolean startNewTimeTracker)
-      throws IOException {
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
     final boolean includeTagGroupA = true;
     final boolean includeTagGroupB = true;
     final boolean includeTagGroupC = true;
@@ -141,6 +175,100 @@ public class HistoricalDataQueueManager {
   }
 
   /**
+   * Determine which of the time tracking files is the current file. Recover from corrupted state if
+   * necessary. This function should be called before the isFile1CurrTimeTrackerFile flag is first
+   * used.
+   *
+   * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
+   * @throws IOException if unable to read or write files
+   * @throws CorruptedTimeTrackerException if the one of the tracking files is corrupted
+   */
+  private static void initTimeTrackerFiles()
+      throws TimeTrackerUnrecoverableException, IOException, CorruptedTimeTrackerException {
+    hasInitTime = true;
+    String startTimeTrackerMsMain;
+    String startTimeTrackerMsFallBack;
+    long file1Time = 0;
+    long file2Time = 0;
+    boolean file1TimeFailed = false;
+    boolean file2TimeFailed = false;
+    final String errorMessageBoth = "Time tracker is unrecoverable.";
+    final String errorMessageSingle = "Current time tracker corrupted, using backup.";
+
+    try {
+      startTimeTrackerMsMain = FileAccessManager.readFileToString(timeMarkerFile1Name);
+      file1Time = Long.parseLong(startTimeTrackerMsMain);
+    } catch (Exception e) {
+      file1TimeFailed = true;
+    }
+    try {
+      startTimeTrackerMsFallBack = FileAccessManager.readFileToString(timeMarkerFile2Name);
+      file2Time = Long.parseLong(startTimeTrackerMsFallBack);
+    } catch (Exception e) {
+      file2TimeFailed = true;
+    }
+
+    if (file1TimeFailed && file2TimeFailed) {
+      writeNewTime(timeMarkerFile1Name);
+      writeNewTime(timeMarkerFile2Name);
+      throw new TimeTrackerUnrecoverableException(errorMessageBoth);
+    } else if (file1TimeFailed) {
+      isFile1CurrTimeTrackerFile = false;
+      throw new CorruptedTimeTrackerException(errorMessageSingle);
+    } else if (file2TimeFailed) {
+      isFile1CurrTimeTrackerFile = true;
+      throw new CorruptedTimeTrackerException(errorMessageSingle);
+    } else {
+      // Both files are in a good state, compare for more recent time.
+      isFile1CurrTimeTrackerFile = (file1Time > file2Time) ? true : false;
+    }
+  }
+
+  /**
+   * Retrieve the start time if it exists, otherwise create a new start time and return the new
+   * start time.
+   *
+   * @param startNewTimeTracker set to true if a new time tracker file is needed.
+   * @param readFile the file path of the time tracking file to read from
+   * @param writeFile the file path of the time tracking file to write to
+   * @return the long representation of the stored time
+   * @throws IOException if unable to read or write files
+   * @throws CorruptedTimeTrackerException if one of the tracking files is corrupted
+   * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
+   */
+  private static long getStartTime(boolean startNewTimeTracker, String readFile, String writeFile)
+      throws IOException, CorruptedTimeTrackerException, TimeTrackerUnrecoverableException {
+    long startTimeTrackerMsLong = 0;
+    String startTimeTrackerMs;
+    if (startNewTimeTracker) {
+      startTimeTrackerMsLong = writeNewTime(writeFile);
+    } else {
+      try {
+        startTimeTrackerMs = FileAccessManager.readFileToString(readFile);
+        startTimeTrackerMsLong = Long.parseLong(startTimeTrackerMs);
+      } catch (Exception e) {
+        initTimeTrackerFiles();
+      }
+    }
+    return startTimeTrackerMsLong;
+  }
+
+  /**
+   * Write out a new start time to the time tracking file.
+   *
+   * @param writeFile the file path of the time tracking file to write to
+   * @return the value written out to the time tracking file.
+   * @throws IOException if unable to read or write files
+   */
+  private static long writeNewTime(String writeFile) throws IOException {
+    long startTimeTrackerMsLong = 0;
+    startTimeTrackerMsLong = getCurrentTimeWithOffset();
+    String startTimeTrackerMs = Long.toString(startTimeTrackerMsLong);
+    FileAccessManager.writeStringToFile(writeFile, startTimeTrackerMs);
+    return startTimeTrackerMsLong;
+  }
+
+  /**
    * Get the historical log data for the specified tag groups within the next FIFO queue time span.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
@@ -150,6 +278,8 @@ public class HistoricalDataQueueManager {
    * @param includeTagGroupD if tag group D data should be included
    * @return historical log data
    * @throws IOException if unable to read or write files
+   * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
+   * @throws CorruptedTimeTrackerException one of the tracking files is corrupted
    */
   public static synchronized ArrayList getFifoNextSpanData(
       boolean startNewTimeTracker,
@@ -157,18 +287,28 @@ public class HistoricalDataQueueManager {
       boolean includeTagGroupB,
       boolean includeTagGroupC,
       boolean includeTagGroupD)
-      throws IOException {
-    // Get start time from file, or start new time tracker if startNewTimeTracker is true.
-    String startTimeTrackerMs;
-    long startTimeTrackerMsLong;
-    if (startNewTimeTracker) {
-      startTimeTrackerMsLong = getCurrentTimeWithOffset();
-      startTimeTrackerMs = Long.toString(startTimeTrackerMsLong);
-      FileAccessManager.writeStringToFile(timeMarkerFileName, startTimeTrackerMs);
-    } else {
-      startTimeTrackerMs = FileAccessManager.readFileToString(timeMarkerFileName);
-      startTimeTrackerMsLong = Long.parseLong(startTimeTrackerMs);
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
+
+    if (!hasInitTime) {
+      initTimeTrackerFiles();
     }
+
+    /*
+     * The two time tracking files will swap on every iteration of grabbing new
+     * data points. Set the correct file using the isFile1CurrTimeTrackerFile flag.
+     */
+    String readFile;
+    String writeFile;
+    if (isFile1CurrTimeTrackerFile) {
+      readFile = timeMarkerFile1Name;
+      writeFile = timeMarkerFile2Name;
+    } else {
+      readFile = timeMarkerFile2Name;
+      writeFile = timeMarkerFile1Name;
+    }
+
+    // Get start time from file, or start new time tracker if startNewTimeTracker is true.
+    long startTimeTrackerMsLong = getStartTime(startNewTimeTracker, readFile, writeFile);
 
     /*
      * Calculate end time from start time + time span. Use current time if calculated
@@ -230,8 +370,10 @@ public class HistoricalDataQueueManager {
 
       // Store end time +1 ms (to prevent duplicate data)
       final String newTimeTrackerVal = Long.toString(endTimeTrackerMsLong + 1);
-      FileAccessManager.writeStringToFile(timeMarkerFileName, newTimeTrackerVal);
+      FileAccessManager.writeStringToFile(writeFile, newTimeTrackerVal);
     }
+
+    isFile1CurrTimeTrackerFile = !isFile1CurrTimeTrackerFile;
 
     // Return data
     return queueData;
