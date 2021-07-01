@@ -3,6 +3,7 @@ package com.hms_networks.americas.sc.historicaldata;
 import com.ewon.ewonitf.Exporter;
 
 import com.hms_networks.americas.sc.datapoint.*;
+import com.hms_networks.americas.sc.json.JSONException;
 import com.hms_networks.americas.sc.string.QuoteSafeStringTokenizer;
 import com.hms_networks.americas.sc.taginfo.TagInfo;
 import com.hms_networks.americas.sc.taginfo.TagInfoManager;
@@ -125,8 +126,9 @@ public class HistoricalDataManager {
    * @param filename historical file to parse
    * @return data points parsed
    * @throws IOException if unable to access or read file
+   * @throws JSONException if unable to parse int to string enumeration file
    */
-  public static ArrayList parseHistoricalFile(String filename) throws IOException {
+  public static ArrayList parseHistoricalFile(String filename) throws IOException, JSONException {
     final int sleepBetweenLinesMs = 5;
     final BufferedReader reader = new BufferedReader(new FileReader(filename));
 
@@ -184,8 +186,9 @@ public class HistoricalDataManager {
    * @param line line to parse
    * @return data point
    * @throws IOException if unable to access tag information
+   * @throws JSONException if unable to parse int to string enumeration file
    */
-  private static DataPoint parseHistoricalFileLine(String line) throws IOException {
+  private static DataPoint parseHistoricalFileLine(String line) throws IOException, JSONException {
     /*
      * Example Line:
      * "TagId";"TimeInt";"TimeStr";"IsInitValue";"Value";"IQuality"
@@ -261,6 +264,16 @@ public class HistoricalDataManager {
             } else if (tagType == TagType.INTEGER) {
               int intValue = Integer.valueOf(tagValue).intValue();
               returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt, dataQuality);
+            } else if (tagType == TagType.INTEGER_MAPPED_STRING) {
+              int intValue = Integer.valueOf(tagValue).intValue();
+              returnVal =
+                  new DataPointIntegerMappedString(
+                      tagName,
+                      tagId,
+                      intValue,
+                      tagTimeInt,
+                      dataQuality,
+                      tagInfo.getEnumeratedStringValueMapping());
             } else if (tagType == TagType.DWORD) {
               long dwordValue = Long.valueOf(tagValue).longValue();
               returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt, dataQuality);
