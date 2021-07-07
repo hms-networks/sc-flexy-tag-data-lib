@@ -1,5 +1,18 @@
 # Ewon Flexy Tag Data Library Changelog
 
+## v2.2
+### Major Changes
+- None
+### Minor Changes
+- Bug Fix: Add corrupted time tracker file recovery
+
+## v2.1
+### Major Changes
+- Feature: Add github build action
+- Feature: Add github branch action
+### Minor Changes
+- None
+
 ## v2.0
 ### Major Changes
 - Feature: Add support for real time data
