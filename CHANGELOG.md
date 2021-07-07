@@ -1,5 +1,11 @@
 # Ewon Flexy Tag Data Library Changelog
 
+## v2.3
+### Major Changes
+- Feature: Add support for int to string enumerations
+### Minor Changes
+- None
+
 ## v2.2
 ### Major Changes
 - None
