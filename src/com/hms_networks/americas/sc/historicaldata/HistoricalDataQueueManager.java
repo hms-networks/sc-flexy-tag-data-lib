@@ -2,6 +2,7 @@ package com.hms_networks.americas.sc.historicaldata;
 
 import com.hms_networks.americas.sc.fileutils.FileAccessManager;
 
+import com.hms_networks.americas.sc.json.JSONException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -162,9 +163,11 @@ public class HistoricalDataQueueManager {
    * @throws IOException if unable to read or write files
    * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
    * @throws CorruptedTimeTrackerException if the current time tracking file is corrupted
+   * @throws JSONException if unable to parse int to string enumeration file
    */
   public static synchronized ArrayList getFifoNextSpanDataAllGroups(boolean startNewTimeTracker)
-      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException,
+          JSONException {
     final boolean includeTagGroupA = true;
     final boolean includeTagGroupB = true;
     final boolean includeTagGroupC = true;
@@ -286,6 +289,7 @@ public class HistoricalDataQueueManager {
    * @throws IOException if unable to read or write files
    * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
    * @throws CorruptedTimeTrackerException one of the tracking files is corrupted
+   * @throws JSONException if unable to parse int to string enumeration file
    */
   public static synchronized ArrayList getFifoNextSpanData(
       boolean startNewTimeTracker,
@@ -293,7 +297,8 @@ public class HistoricalDataQueueManager {
       boolean includeTagGroupB,
       boolean includeTagGroupC,
       boolean includeTagGroupD)
-      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException,
+          JSONException {
 
     if (!hasInitTime) {
       initTimeTrackerFiles();
