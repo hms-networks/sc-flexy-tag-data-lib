@@ -152,7 +152,10 @@ public class HistoricalDataQueueManager {
   }
 
   /**
-   * Get the historical log data for all tag groups within the next FIFO queue time span.
+   * Get the historical log data for all tag groups within the next FIFO queue time span. The
+   * operations performed in this method consume a significant amount of memory and it is
+   * recommended that the Ewon Flexy Java heap size be increased to 25M (25 MB) or greater. Failure
+   * to do so may result in slow performance or unexpected behavior.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
    * @return historical log data
@@ -270,6 +273,9 @@ public class HistoricalDataQueueManager {
 
   /**
    * Get the historical log data for the specified tag groups within the next FIFO queue time span.
+   * The operations performed in this method consume a significant amount of memory and it is
+   * recommended that the Ewon Flexy Java heap size be increased to 20M or greater. Failure to do so
+   * may result in slow performance or unexpected behavior.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
    * @param includeTagGroupA if tag group A data should be included
