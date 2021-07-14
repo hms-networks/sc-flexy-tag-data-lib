@@ -6,6 +6,7 @@ import com.hms_networks.americas.sc.datapoint.*;
 import com.hms_networks.americas.sc.json.JSONException;
 import com.hms_networks.americas.sc.string.QuoteSafeStringTokenizer;
 import com.hms_networks.americas.sc.taginfo.TagInfo;
+import com.hms_networks.americas.sc.taginfo.TagInfoEnumeratedIntToString;
 import com.hms_networks.americas.sc.taginfo.TagInfoManager;
 import com.hms_networks.americas.sc.taginfo.TagType;
 import java.io.BufferedReader;
@@ -266,6 +267,8 @@ public class HistoricalDataManager {
               returnVal = new DataPointInteger(tagName, tagId, intValue, tagTimeInt, dataQuality);
             } else if (tagType == TagType.INTEGER_MAPPED_STRING) {
               int intValue = Integer.valueOf(tagValue).intValue();
+              TagInfoEnumeratedIntToString tagInfoEnumeratedIntToString =
+                  (TagInfoEnumeratedIntToString) tagInfo;
               returnVal =
                   new DataPointIntegerMappedString(
                       tagName,
@@ -273,7 +276,7 @@ public class HistoricalDataManager {
                       intValue,
                       tagTimeInt,
                       dataQuality,
-                      tagInfo.getEnumeratedStringValueMapping());
+                      tagInfoEnumeratedIntToString.getEnumeratedStringValueMapping());
             } else if (tagType == TagType.DWORD) {
               long dwordValue = Long.valueOf(tagValue).longValue();
               returnVal = new DataPointDword(tagName, tagId, dwordValue, tagTimeInt, dataQuality);
