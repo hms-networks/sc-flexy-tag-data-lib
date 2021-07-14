@@ -1,5 +1,13 @@
 # Ewon Flexy Tag Data Library Changelog
 
+## v2.3.1
+### Major Changes
+- None
+### Minor Changes
+- Bug Fix: Fix bug causing an uncaught JSONException
+- Bug Fix: Correct mistakes in developer Javadoc documentation
+- Feature: Added Java heap size notice for historical data
+
 ## v2.3
 ### Major Changes
 - Feature: Add support for int to string enumerations
