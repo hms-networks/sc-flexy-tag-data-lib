@@ -6,6 +6,7 @@ THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT WARRANT 
 ## [Table of Contents](#table-of-contents)
 
 1. [Description](#description)
+   1. [Memory Heap Size Notice](#memory-heap-size-notice)
 2. [Developer Documentation](#developer-documentation)
 3. [Dependencies](#dependencies)
 
@@ -14,6 +15,11 @@ THE CODE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. HMS DOES NOT WARRANT 
 ## [Description](#table-of-contents)
 
 A library to get historical or real time tag values.
+
+### [Memory Heap Size Notice](#table-of-contents)
+
+The operations performed in the historical data portions of this library use a significant amount of memory, and it is recommended that the Ewon Flexy Java heap size be increased to 25M (25 MB) or greater.
+Failure to do so may result in slow performance or unexpected behavior when using the historical data functionality of this library.
 
 ## [Developer Documentation](#table-of-contents)
 

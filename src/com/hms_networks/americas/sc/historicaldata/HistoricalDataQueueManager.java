@@ -2,6 +2,7 @@ package com.hms_networks.americas.sc.historicaldata;
 
 import com.hms_networks.americas.sc.fileutils.FileAccessManager;
 
+import com.hms_networks.americas.sc.json.JSONException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -152,16 +153,21 @@ public class HistoricalDataQueueManager {
   }
 
   /**
-   * Get the historical log data for all tag groups within the next FIFO queue time span.
+   * Get the historical log data for all tag groups within the next FIFO queue time span. The
+   * operations performed in this method consume a significant amount of memory and it is
+   * recommended that the Ewon Flexy Java heap size be increased to 25M (25 MB) or greater. Failure
+   * to do so may result in slow performance or unexpected behavior.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
    * @return historical log data
    * @throws IOException if unable to read or write files
    * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
    * @throws CorruptedTimeTrackerException if the current time tracking file is corrupted
+   * @throws JSONException if unable to parse int to string enumeration file
    */
   public static synchronized ArrayList getFifoNextSpanDataAllGroups(boolean startNewTimeTracker)
-      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException,
+          JSONException {
     final boolean includeTagGroupA = true;
     final boolean includeTagGroupB = true;
     final boolean includeTagGroupC = true;
@@ -270,6 +276,9 @@ public class HistoricalDataQueueManager {
 
   /**
    * Get the historical log data for the specified tag groups within the next FIFO queue time span.
+   * The operations performed in this method consume a significant amount of memory and it is
+   * recommended that the Ewon Flexy Java heap size be increased to 20M or greater. Failure to do so
+   * may result in slow performance or unexpected behavior.
    *
    * @param startNewTimeTracker if new time tracker should be generated, not read from storage
    * @param includeTagGroupA if tag group A data should be included
@@ -280,6 +289,7 @@ public class HistoricalDataQueueManager {
    * @throws IOException if unable to read or write files
    * @throws TimeTrackerUnrecoverableException if both time tracking files are corrupted
    * @throws CorruptedTimeTrackerException one of the tracking files is corrupted
+   * @throws JSONException if unable to parse int to string enumeration file
    */
   public static synchronized ArrayList getFifoNextSpanData(
       boolean startNewTimeTracker,
@@ -287,7 +297,8 @@ public class HistoricalDataQueueManager {
       boolean includeTagGroupB,
       boolean includeTagGroupC,
       boolean includeTagGroupD)
-      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException {
+      throws IOException, TimeTrackerUnrecoverableException, CorruptedTimeTrackerException,
+          JSONException {
 
     if (!hasInitTime) {
       initTimeTrackerFiles();
